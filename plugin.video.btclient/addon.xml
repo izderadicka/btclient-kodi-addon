@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.btclient" name="BTClient" version="0.1.0" provider-name="IZ">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">BTClient add-on</summary>
+    <description lang="en">Enables to play videos via BTClient for torrents and file sharing server. BTClient must be already installed!</description>
+    <disclaimer lang="en"></disclaimer>
+    <language>en</language>
+    <platform>linux</platform>
+    <license>GPL v3</license>
+    <forum></forum>
+    <website></website>
+    <email>ivan@zderadicka.eu</email>
+    <source></source>
+  </extension>
+</addon>
