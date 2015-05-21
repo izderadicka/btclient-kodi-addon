@@ -2,7 +2,10 @@
 <settings>
     <category label="General">
         <setting label="Download Directory" type="folder"   id="download_dir" option="writable"/>
+        <setting id="delete_on_finish" type="bool" label="Delete file after playback ends" default="false"/>
+         <setting id="clear_older" type="number" label="Delete files older x days from download directory" default="0"/>
         <setting id="debug" type="bool" label="Enable Debug Log" default="false"/>
+        
     </category>
    
 </settings>

@@ -17,7 +17,7 @@ import json
 
 
 class Client(object):
-    def __init__(self, download_dir, log_file=None, port=5002):
+    def __init__(self, download_dir, log_file=None, port=5002, delete_on_finish=False, clear_older=0):
         pyfile=self._find_exe()
         if not pyfile:
             raise Exception('btclient.py not found')
@@ -26,7 +26,10 @@ class Client(object):
             self.params.extend(['--debug-log', log_file])
         if port:
             self.params.extend(['--port', str(port)])
-            
+        if delete_on_finish:
+            self.params.append('--delete-on-finish')   
+        if clear_older:
+            self.params.extend(['--clear-older', str(clear_older)]) 
         self._p=None
         self._wait_ready=Event()
         self.link=None

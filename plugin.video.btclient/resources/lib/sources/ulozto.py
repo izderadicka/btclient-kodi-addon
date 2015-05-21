@@ -59,7 +59,8 @@ def resolve(url):
     
 BASE= 'http://uloz.to/'   
 def search(query):
-    url=BASE+'hledej/?media=video&type=size__desc&q='+urllib.quote(query)
+    #&type=size__desc 
+    url=BASE+'hledej/?media=video&q='+urllib.quote(query)
     page = request(url,headers={'X-Requested-With':'XMLHttpRequest','Referer':url,'Cookie':'uloz-to-id=1561277170;'})
     script = substr(page,'var kn','</script>')
     keymap = None
