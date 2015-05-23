@@ -49,10 +49,13 @@ class Client(object):
             mb=float(1024*1024)
             kb=float(1024)
             msg="""{status} - Downloaded:  {progress:.2%} {downloaded:.0f}MB/{total_size:.0f}MB
-Down. Rate {byte_rate:.1f}kB/s (need {desired_rate:.1f}kB/s)""".format(status=status['state'],
-            progress=status['progress'], downloaded=status['downloaded']/mb,
-            total_size=status['total_size']/mb, byte_rate=status['download_rate']/kb,
-            desired_rate=status['desired_rate']/kb)
+Down. Rate {byte_rate:.1f}kB/s (need {desired_rate:.1f}kB/s)""".format(
+            status=status['state'],
+            progress=status['progress'], 
+            downloaded=(status['downloaded'] or 0)/mb,
+            total_size=(status['total_size'] or 0)/mb, 
+            byte_rate=(status['download_rate'] or 0)/kb,
+            desired_rate=(status['desired_rate'] or 0)/kb)
             return msg
         except Exception,e:
             xbmc.log('Error while getting status: %s'%e, xbmc.LOGERROR)
