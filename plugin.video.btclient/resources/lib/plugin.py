@@ -85,10 +85,12 @@ def debug(s):
     print s
     
     
-def play(download_dir, url,item=None, debug=False, delete_on_finish=False, clear_older=0):
+def play(download_dir, url,item=None, debug=False, delete_on_finish=False, clear_older=0,
+         bt_download_limit=0, bt_upload_limit=0):
     print "URL is", url, 'Dir is', download_dir
     with closing(Client(download_dir, os.path.join(download_dir, 'btclient.log') if debug else None, 
-                 delete_on_finish=delete_on_finish, clear_older=clear_older)) as c:
+                 delete_on_finish=delete_on_finish, clear_older=clear_older,
+                 bt_download_limit=bt_download_limit, bt_upload_limit=bt_upload_limit)) as c:
         with closing(xbmcgui.DialogProgress()) as d:
             d.create('Preloading', 'Loading video from stream ...')
             d.update(0)

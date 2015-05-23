@@ -13,6 +13,8 @@ addon = xbmcaddon.Addon()
 download_dir=addon.getSetting('download_dir')
 delete_on_finish=bool( addon.getSetting('delete_on_finish') == 'true')
 clear_older=int(addon.getSetting('clear_older'))
+bt_download_limit=int(addon.getSetting('bt_download_limit'))
+bt_upload_limit=int(addon.getSetting('bt_upload_limit'))
 debug= bool(addon.getSetting('debug')=='true')
 
 base,handle,params=parse_args()
@@ -26,6 +28,7 @@ print 'Debug enabled?', debug
 if not download_dir:
     xbmcgui.Dialog().notification('Settings Error!', 'Download directory is not set', 
                                   xbmcgui.NOTIFICATION_ERROR)  # @UndefinedVariable
+    sys.exit(1)
 
 action=params.get('action')
 print 'Action =', action
@@ -36,8 +39,9 @@ if not action:
 #     xbmcplugin.addDirectoryItem(handle=handle, url=url, listitem=li)
     xbmcplugin.addDirectoryItem(handle, build_url(base,action='search'), 
                             xbmcgui.ListItem('Search'), isFolder=True)
-    xbmcplugin.addDirectoryItem(handle, download_dir, 
-                            xbmcgui.ListItem('Downloaded files'), isFolder=True)
+    
+#     xbmcplugin.addDirectoryItem(handle, download_dir, 
+#                             xbmcgui.ListItem('Downloaded files'), isFolder=True)
     for s in search_history(addon):
         xbmcplugin.addDirectoryItem(handle, build_url(base,action='search', query=s), 
                             xbmcgui.ListItem(s), isFolder=True)
@@ -54,7 +58,8 @@ elif action==['search']:
 elif action==['play']:
     url=resolve(params.get('source')[0], params.get('url')[0])
     print 'PLAY', url
-    play(download_dir,url, debug=debug, delete_on_finish=delete_on_finish, clear_older=clear_older)
+    play(download_dir,url, debug=debug, delete_on_finish=delete_on_finish, clear_older=clear_older,
+         bt_download_limit=bt_download_limit, bt_upload_limit=bt_upload_limit)
 
 if (handle>=0):
     xbmcplugin.endOfDirectory(handle)

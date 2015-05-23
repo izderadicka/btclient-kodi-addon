@@ -17,7 +17,8 @@ import json
 
 
 class Client(object):
-    def __init__(self, download_dir, log_file=None, port=5002, delete_on_finish=False, clear_older=0):
+    def __init__(self, download_dir, log_file=None, port=5002, delete_on_finish=False, clear_older=0,
+                 bt_download_limit=0, bt_upload_limit=0):
         pyfile=self._find_exe()
         if not pyfile:
             raise Exception('btclient.py not found')
@@ -30,6 +31,10 @@ class Client(object):
             self.params.append('--delete-on-finish')   
         if clear_older:
             self.params.extend(['--clear-older', str(clear_older)]) 
+        if bt_download_limit:
+            self.params.extend(['--bt-download-limit', str(bt_download_limit)])
+        if bt_upload_limit:
+            self.params.extend(['--bt-upload-limit', str(bt_upload_limit)])
         self._p=None
         self._wait_ready=Event()
         self.link=None
