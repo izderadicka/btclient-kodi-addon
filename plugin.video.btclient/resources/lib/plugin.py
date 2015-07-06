@@ -127,6 +127,7 @@ def search_history(addon):
 def add_to_search_history(addon, s):
     if not s:
         return
+    s=s.encode('utf8',errors='ignore')
     l= search_history(addon)
     if s in l:
         l.remove(s)
