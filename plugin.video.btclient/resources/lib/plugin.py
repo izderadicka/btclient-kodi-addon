@@ -17,6 +17,7 @@ import time
 from contextlib import closing
 import sources
 from threading import Thread
+import traceback
 
 def parse_args(args=None):
     args=args or sys.argv
@@ -62,9 +63,13 @@ def search(base,kw):
     def s(p,q):
         def add_src(i):
             i['source']=p.__name__
-        r=p.search(q)
-        map(add_src,r)
-        res.append(r)
+        try: 
+            r=p.search(q)
+            map(add_src,r)
+            res.append(r)
+        except Exception,e:
+            print "Search in plugin %s failed with %s " % (p.__name__, e)
+            traceback.print_exc()
     threads=[]    
     for p in sources.plugs:
         threads.append(Thread(target=s, args=(p,kw)))
@@ -127,7 +132,7 @@ def search_history(addon):
 def add_to_search_history(addon, s):
     if not s:
         return
-    s=s.encode('utf8',errors='ignore')
+    s=s.encode('utf8',errors='ignore') if isinstance(s, unicode) else s
     l= search_history(addon)
     if s in l:
         l.remove(s)
