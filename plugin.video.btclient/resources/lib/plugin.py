@@ -115,6 +115,7 @@ def play(download_dir, url,item=None, debug=False, delete_on_finish=False, clear
             
         with closing(MyPlayer()) as p:
             p.play(c.link)
+            xbmc.sleep(1000) # wait for player to start
             while p.isPlaying():
                     p.update_status(lambda:c.status)
                     xbmc.sleep(1000)    

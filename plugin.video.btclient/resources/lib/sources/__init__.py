@@ -1,6 +1,6 @@
 import ulozto, btdigg
 
-plugs=(ulozto,btdigg)
+plugs=(ulozto,)
 
 
 def resolve(src, url):

@@ -11,6 +11,12 @@ import urllib2
 import re
 import json
 import urlparse
+import os
+try:
+    from  .. import phantomjs
+except (ImportError, ValueError):
+    import phantomjs
+    
 
 def debug(s):
     print s
@@ -25,91 +31,50 @@ def substr(data,start,end):
 
 
 UA='Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'
+class RedirectFilter(urllib2.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, hdrs, newurl):
+        return None    
 
-def request(url,headers={}):
+no_redirect_opener = urllib2.build_opener(RedirectFilter)
+
+def redirect(url,headers={}):
     debug('request: %s' % url)
+    headers['User-Agent'] = UA
     req = urllib2.Request(url,headers=headers)
-    response = urllib2.urlopen(req)
-    data = response.read()
-    response.close()
-    debug('len(data) %s' % len(data))
-    return data
-
-def post_json(url,data,headers={}):
-    postdata = json.dumps(data)
-    headers['Content-Type'] = 'application/json'
-    req = urllib2.Request(url,postdata,headers)
-    req.add_header('User-Agent',UA)
-    response = urllib2.urlopen(req)
-    data = response.read()
-    response.close()
-    return data
+    try:
+        no_redirect_opener.open(req)
+    except urllib2.HTTPError as e:
+        if e.code == 301:
+            new_url = e.headers['Location']
+            parsed_url = urlparse.urlsplit(new_url)
+            if parsed_url.path.startswith('/!'):
+                return new_url
+    
 
 
 def resolve(url):
-        if url.startswith('#'):
-            ret = json.loads(request(url[1:]))
-            if ret.has_key('result'):
-                url = b64decode(ret['result'])
-                url=urlparse.urljoin(BASE, url)
-                
-            else:
-                print 'Ulozto - decrypt problem'
-        return url
+    return redirect(url)
     
-BASE= 'http://uloz.to/'   
+BASE= 'https://uloz.to/'   
+PHANTOM = phantomjs.JSEngine(os.path.join(os.path.dirname(__file__), '../../data/ulozto.js'), 15)
 def search(query):
     #&type=size__desc 
-    url=BASE+'hledej/?media=video&q='+urllib.quote(query)
-    page = request(url,headers={'X-Requested-With':'XMLHttpRequest','Referer':url,'Cookie':'uloz-to-id=1561277170;'})
-    script = substr(page,'var kn','</script>')
-    keymap = None
-    key = None
-    k = re.search('{([^\;]+)"',script,re.IGNORECASE | re.DOTALL)
-    if k:
-        keymap = json.loads("{"+k.group(1)+"\"}")
-    j = re.search('kapp\(kn\[\"([^\"]+)"',script,re.IGNORECASE | re.DOTALL)
-    if j:
-        key = j.group(1)
-    if not (j and k):
-        error('error parsing page - unable to locate keys')
-        return []
-    burl = b64decode('I2h0dHA6Ly9kZWNyLWNlY2gucmhjbG91ZC5jb20vZGVjcnlwdC8/a2V5PSVzJnZhbHVlPSVz')
-    murl = b64decode('aHR0cDovL2RlY3ItY2VjaC5yaGNsb3VkLmNvbS9kZWNyeXB0Lw==')
-    data = substr(page,'<ul class=\"chessFiles','</ul>') 
-    result = []
-    req = {'seed':keymap[key],'values':keymap}
-    decr = json.loads(post_json(murl,req))
-    for li in re.finditer('<li data-icon=\"(?P<key>[^\"]+)',data, re.IGNORECASE |  re.DOTALL):
-        body = urllib.unquote(b64decode(decr[li.group('key')]))
-        m = re.search('<li class=\"jsNopeContainer \".+?<div data-icon=\"(?P<key>[^\"]+)[^<]+<img(.+?)src=\"(?P<logo>[^\"]+)(.+?)<div class=\"fileInfo(?P<info>.+?)</h4>',body, re.IGNORECASE |  re.DOTALL)
-        if not m:
-            continue
-        value = keymap[m.group('key')]
-        info = m.group('info')
-        iurl = burl % (keymap[key],value)
-        item = {}
-        item['title'] = '.. title not found..'
-        title = re.search('<div class=\"fileName.+?<a[^>]+>(?P<title>[^<]+)',info, re.IGNORECASE|re.DOTALL)
-        if title:
-            item['title'] = title.group('title')
-        size = re.search('<span class=\"fileSize[^>]+>(?P<size>[^<]+)',info, re.IGNORECASE|re.DOTALL)
-        if size:
-            item['size'] = size.group('size').strip()
-            item['title']+=' (%s)'%item['size']
-        time = re.search('<span class=\"fileTime[^>]+>(?P<time>[^<]+)',info, re.IGNORECASE|re.DOTALL)
-        if time:
-            item['length'] = time.group('time')
-        item['url'] = iurl
-        item['img'] = m.group('logo')
-        result.append(item)
-    # page navigation
-#     data = util.substr(page,'<div class=\"paginator','</div')
-#     mnext = re.search('<a href=\"(?P<url>[^\"]+)\" class="next',data)
-#     if mnext:
-#         item = self.dir_item()
-#         item['type'] = 'next'
-#         item['url'] = mnext.group('url')
-#         result.append(item)
-    debug('Ulozto found %d items'%(len(result),))
-    return result
+    url=BASE+'hledej/?type=videos&q='+urllib.quote(query)
+    res = PHANTOM.eval(url)
+    res = json.loads(res)
+    res = filter(lambda i: 'name' in i and 'url' in i, res)
+    if res[0]['name'] == 'mtbr.avi':
+        res=res[1:]
+    for i in res:
+        if 'size' in i:
+            i['name'] = i['name']+ ' (%s)'% i['size']
+        i['url'] = urlparse.urljoin(BASE, i['url'])
+        i['img'] = urlparse.urljoin(BASE, i['img'])
+        
+    return res
+    
+
+if __name__ == '__main__':
+    res= search('samotari')
+    print redirect(res[0]['url'])
+    
