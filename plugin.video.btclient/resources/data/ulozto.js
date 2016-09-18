@@ -65,13 +65,16 @@ page.open(url, function (status) {
 					  var link = $('div.name a', item);
 					  var size = getText('.fa-database');
 					  var length = getText('.fa-clock-o');
-					  var img = $('div.img img').attr('src');
-					  result.push({url: link.attr('href'), 
-						  			name:link.text(),
-						  			size: size,
-						  			legth: length,
-						  			img : img
-						  			});
+					  var img = $('div.img img', item).attr('src');
+					  var locked =$('.lock', item).length
+					  if (!locked) {
+						  result.push({url: link.attr('href'), 
+							  			name:link.text(),
+							  			size: size,
+							  			legth: length,
+							  			img : img
+							  			});
+					  }
 				  	});
 				  return result;
 

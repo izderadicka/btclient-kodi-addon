@@ -40,6 +40,7 @@ def kbd_input(default=u"", heading="", hidden=False ):
 
 def add_item(name,url,iconimage=''):
     liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
+    #liz.setArt({'thumb': iconimage, 'fanart':iconimage})
     liz.setInfo( type="Video", infoLabels={ "Title": name } )
     ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=liz)
     return ok  
