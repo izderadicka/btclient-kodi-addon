@@ -1,6 +1,6 @@
-import ulozto, btdigg
+import ulozto, yts
 
-plugs=(ulozto,)
+plugs=(yts,)
 
 
 def resolve(src, url):

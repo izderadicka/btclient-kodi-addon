@@ -75,7 +75,8 @@ def search(query):
     
 
 if __name__ == '__main__':
-    res= search('diva bara')
-    print map(lambda x: x['name'], filter(lambda x: x['name'].find('.mp4')>=0, res))
-    print redirect(res[0]['url'])
+    res= search('duchacek')
+    mp4_file = filter(lambda x: x['name'].find('.mp4')>=0, res)[0]
+    print mp4_file["name"]
+    print resolve(mp4_file['url'])
     

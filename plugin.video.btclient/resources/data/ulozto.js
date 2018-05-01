@@ -24,6 +24,7 @@ function waitFor(testFx, onReady, timeOutMillis) {
                 if(!condition) {
                     // If condition still not fulfilled (timeout but condition
 					// is 'false')
+					console.error("Processing timeout");
                     phantom.exit(3);
                 } else {
                     // Condition fulfilled (timeout and/or condition is 'true')
@@ -48,14 +49,14 @@ page.open(url, function (status) {
 		  function() {
 			  return page.evaluate(
 			  function(){
-				  return $('#filegrid-items').hasClass('loaded');
+				  return $('div.search-result').hasClass('loaded');
 			  });
   			},
   			// do action
   			function() {
 		      var result = page.evaluate(function() {
 			  var result = [];
-			  var base = $('#filegrid-items');
+			  var base = $('div.search-result');
 			  if (base.hasClass('loaded')) {
 				  $('.item', base).each(function(idx, item) {
 					  var getText = function(cls) {
@@ -63,8 +64,8 @@ page.open(url, function (status) {
 						  .filter(function() { return this.nodeType == Node.TEXT_NODE; }).text().trim();
 					  };
 					  var link = $('div.name a', item);
-					  var size = getText('.fa-database');
-					  var length = getText('.fa-clock-o');
+					  var size = getText('.fi-database');
+					  var length = getText('.fi-clock-o');
 					  var img = $('div.img img', item).attr('src');
 					  var locked =$('.lock', item).length
 					  if (!locked) {

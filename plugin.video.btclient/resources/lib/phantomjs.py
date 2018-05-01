@@ -13,9 +13,6 @@ if os.access(local_ps, os.R_OK|os.X_OK):
     PHANTOM = local_ps
 
 
-
-
-
 class PhantomError(Exception):
     pass
 class JSEngine(object):
@@ -46,7 +43,7 @@ class JSEngine(object):
             
 if __name__ == '__main__':
     script = os.path.join(os.path.dirname(__file__), '../data/ulozto.js')
-    engine= JSEngine(script, 10)
+    engine= JSEngine(script, 20)
     print engine.eval(sys.argv[1])
             
         
